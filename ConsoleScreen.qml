@@ -39,20 +39,5 @@ Rectangle {
 		text: "%1/%2".arg(controller.currentSlideNumber + 1).arg(controller.slideCount)
 	}
 
-	focus: true
-	Keys.onLeftPressed: controller.previousSlide()
-	Keys.onRightPressed: controller.nextSlide()
-
-	Keys.onPressed: {
-		if(event.key == Qt.Key_Q)
-		{
-			controller.quit();
-			event.accepted = true;
-		}
-		else if(event.key == Qt.Key_R)
-		{
-			controller.resetTime();
-			event.accepted = true;
-		}
-	}
+	KeyMap {}
 }

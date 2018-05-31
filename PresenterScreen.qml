@@ -12,4 +12,6 @@ Rectangle {
 		anchors.fill: parent
 		page: controller.currentPage
 	}
+
+	KeyMap {}
 }
