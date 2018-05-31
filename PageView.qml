@@ -6,6 +6,7 @@ import presenter 1.0
 
 Rectangle {
 	property var page
+	property bool preview: false
 
 	height: width / imageView.aspectRatio
 	color: "black"
@@ -25,7 +26,7 @@ Rectangle {
 	}
 
 	Repeater {
-		model: page ? page.videoObjects : 0
+		model: (!preview && page) ? page.videoObjects : 0
 		Video {
 			source: modelData.url
 			autoPlay: modelData.autostart

@@ -5,6 +5,7 @@ import presenter 1.0
 Rectangle {
 	anchors.fill: parent
 	color: "black"
+	id: container
 
 	PageView {
 		id: currentSlideView
@@ -37,6 +38,24 @@ Rectangle {
 		anchors.bottom: parent.bottom
 		anchors.right: parent.right
 		text: "%1/%2".arg(controller.currentSlideNumber + 1).arg(controller.slideCount)
+	}
+
+	Rectangle {
+		color: "black"
+		anchors.fill: parent
+		visible: controller.slideSelectorActive
+
+		GridView {
+			anchors.fill: parent
+			model: controller.allPages
+			cellWidth: container.width / 4
+			cellHeight: 9.0 / 16.0 * cellWidth /* FIXME */
+			delegate: PageView {
+				width: container.width / 4
+				page: modelData
+				preview: true
+			}
+		}
 	}
 
 	KeyMap {}

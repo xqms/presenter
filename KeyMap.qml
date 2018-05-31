@@ -6,6 +6,7 @@ Item {
 	Keys.onLeftPressed: controller.previousSlide()
 	Keys.onRightPressed: controller.nextSlide()
 	Keys.onSpacePressed: controller.nextSlide()
+	Keys.onTabPressed: controller.slideSelectorActive = !controller.slideSelectorActive
 
 	Keys.onPressed: {
 		if(event.key == Qt.Key_Q)
