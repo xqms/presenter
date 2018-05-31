@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 	QQuickView view;
 	view.showFullScreen();
 	view.engine()->rootContext()->setContextProperty("controller", &controller);
-	view.setSource(QUrl("../PageView.qml"));
+	view.setSource(QUrl("../ConsoleScreen.qml"));
 
 	return app.exec();
 }

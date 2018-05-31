@@ -4,7 +4,9 @@ import QtQuick.Controls 1.2
 import presenter 1.0
 
 Rectangle {
-	anchors.fill: parent
+	property var page
+
+	height: width / imageView.aspectRatio
 	color: "black"
 
 	BusyIndicator {
@@ -12,23 +14,12 @@ Rectangle {
 		width: parent.width / 3
 		height: width
 
-		running: !controller.currentPage.ready
+		running: page ? !page.ready : false
 	}
 
 	ImageView {
+		id: imageView
 		anchors.fill: parent
-		image: controller.currentPage.image
-	}
-
-	focus: true
-	Keys.onLeftPressed: controller.previousSlide()
-	Keys.onRightPressed: controller.nextSlide()
-
-	Keys.onPressed: {
-		if(event.key == Qt.Key_Q)
-		{
-			controller.quit();
-			event.accepted = true;
-		}
+		image: page ? page.image : nullImage
 	}
 }

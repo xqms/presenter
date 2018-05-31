@@ -13,6 +13,7 @@ class ViewController : public QObject
 Q_OBJECT
 Q_PROPERTY(int currentSlideNumber READ currentSlideNumber WRITE setCurrentSlideNumber NOTIFY currentSlideNumberChanged)
 Q_PROPERTY(QObject* currentPage READ currentPage NOTIFY currentSlideNumberChanged)
+Q_PROPERTY(QObject* nextPage READ nextPage NOTIFY currentSlideNumberChanged)
 public:
 	explicit ViewController(RenderingPool* renderingPool, QObject* parent = 0);
 
@@ -21,6 +22,8 @@ public:
 
 	QObject* currentPage() const
 	{ return (*m_renderingPool)[m_slideNumber]; }
+
+	QObject* nextPage() const;
 
 public Q_SLOTS:
 	void nextSlide();

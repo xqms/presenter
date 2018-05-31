@@ -31,3 +31,11 @@ void ViewController::quit()
 {
 	QApplication::exit(0);
 }
+
+QObject* ViewController::nextPage() const
+{
+	if(currentSlideNumber() >= m_renderingPool->count()-1)
+		return nullptr;
+
+	return (*m_renderingPool)[currentSlideNumber() + 1];
+}
