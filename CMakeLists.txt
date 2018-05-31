@@ -19,7 +19,6 @@ qt5_wrap_cpp(MOC_SRCS
 	image_view.h
 	view_controller.h
 	video_object.h
-	video_tee.h
 )
 
 add_executable(presenter
@@ -29,7 +28,6 @@ add_executable(presenter
 	image_view.cpp
 	view_controller.cpp
 	video_object.cpp
-	video_tee.cpp
 )
 target_link_libraries(presenter
 	Qt5::Widgets
