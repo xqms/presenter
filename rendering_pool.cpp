@@ -2,16 +2,29 @@
 // Author: Max Schwarz <max.schwarz@online.de>
 
 #include "rendering_pool.h"
+#include "video_object.h"
 
 #include <QtConcurrent/QtConcurrent>
 
 #include <iostream>
 
-RenderingPage::RenderingPage(Poppler::Page* page, QThreadPool* pool, QObject* parent)
+RenderingPage::RenderingPage(const QUrl& file, Poppler::Page* page, QThreadPool* pool, QObject* parent)
  : QObject(parent)
  , m_page(page)
  , m_pool(pool)
 {
+	for(auto& link : m_page->links())
+	{
+		if(link->linkType() == Poppler::Link::Execute)
+		{
+			auto execLink = reinterpret_cast<Poppler::LinkExecute*>(link);
+
+			VideoObject* obj = new VideoObject(this);
+			obj->setArea(execLink->linkArea());
+			obj->setupFromLink(file, execLink->fileName());
+			m_videoObjects.append(obj);
+		}
+	}
 }
 
 RenderingPage::~RenderingPage()
@@ -70,7 +83,7 @@ void RenderingPage::render()
 	}
 }
 
-RenderingPool::RenderingPool(const std::shared_ptr<Poppler::Document>& doc, QObject* parent)
+RenderingPool::RenderingPool(const QUrl& file, const std::shared_ptr<Poppler::Document>& doc, QObject* parent)
  : QObject(parent)
  , m_doc(doc)
 {
@@ -78,7 +91,7 @@ RenderingPool::RenderingPool(const std::shared_ptr<Poppler::Document>& doc, QObj
 
 	for(int i = 0; i < m_doc->numPages(); ++i)
 	{
-		auto page = new RenderingPage(doc->page(i), m_pool, this);
+		auto page = new RenderingPage(file, doc->page(i), m_pool, this);
 		connect(page, &RenderingPage::readyChanged, this, &RenderingPool::checkFinished);
 		append(page);
 	}

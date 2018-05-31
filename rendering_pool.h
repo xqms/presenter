@@ -20,8 +20,9 @@ class RenderingPage : public QObject
 Q_OBJECT
 Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
 Q_PROPERTY(QImage image READ image NOTIFY imageChanged)
+Q_PROPERTY(QList<QObject*> videoObjects READ videoObjects CONSTANT)
 public:
-	explicit RenderingPage(Poppler::Page* page, QThreadPool* pool, QObject* parent = 0);
+	explicit RenderingPage(const QUrl& file, Poppler::Page* page, QThreadPool* pool, QObject* parent = 0);
 	virtual ~RenderingPage();
 
 	bool ready() const;
@@ -30,6 +31,12 @@ public:
 
 	void triggerRender(const QSize& size);
 	void render();
+
+	const QList<QObject*>& videoObjects() const
+	{ return m_videoObjects; }
+
+	Poppler::Page* page() const
+	{ return m_page; }
 Q_SIGNALS:
 	void readyChanged();
 	void imageChanged();
@@ -39,6 +46,8 @@ private:
 	QSize m_size;
 	QImage m_image;
 
+	QList<QObject*> m_videoObjects;
+
 	QThreadPool* m_pool;
 	QFuture<void> m_future;
 };
@@ -47,7 +56,7 @@ class RenderingPool : public QObject, public QList<QObject*>
 {
 Q_OBJECT
 public:
-	explicit RenderingPool(const std::shared_ptr<Poppler::Document>& doc, QObject* parent = 0);
+	explicit RenderingPool(const QUrl& url, const std::shared_ptr<Poppler::Document>& doc, QObject* parent = 0);
 	virtual ~RenderingPool();
 
 	void triggerRender(const QSize& size);

@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	RenderingPool pool(document);
+	RenderingPool pool(QUrl::fromLocalFile(file), document);
 
 	QObject::connect(&pool, &RenderingPool::renderingFinished, [&](){
 		reinterpret_cast<RenderingPage*>(pool.at(0))->image().save("/tmp/test.png");
