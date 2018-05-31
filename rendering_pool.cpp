@@ -1,0 +1,111 @@
+// Manages render threads
+// Author: Max Schwarz <max.schwarz@online.de>
+
+#include "rendering_pool.h"
+
+#include <QtConcurrent/QtConcurrent>
+
+#include <iostream>
+
+RenderingPage::RenderingPage(Poppler::Page* page, QThreadPool* pool, QObject* parent)
+ : QObject(parent)
+ , m_page(page)
+ , m_pool(pool)
+{
+}
+
+RenderingPage::~RenderingPage()
+{
+}
+
+bool RenderingPage::ready() const
+{
+	QMutexLocker locker(&m_mutex);
+	return !m_image.isNull();
+}
+
+QImage RenderingPage::image() const
+{
+	QMutexLocker locker(&m_mutex);
+	return m_image;
+}
+
+void RenderingPage::triggerRender(const QSize& size)
+{
+	if(!m_future.isFinished())
+	{
+		m_future.cancel();
+		m_future.waitForFinished();
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		m_image = QImage();
+		m_size = size;
+	}
+
+	m_future = QtConcurrent::run(m_pool, this, &RenderingPage::render);
+}
+
+void RenderingPage::render()
+{
+	QSizeF pageSize = m_page->pageSizeF() / 72.0;
+	float dpi = std::min(
+		m_size.width() / pageSize.width(),
+		m_size.height() / pageSize.height()
+	);
+
+	QImage image = m_page->renderToImage(dpi, dpi);
+	if(image.isNull())
+	{
+		std::cerr << "Could not render image";
+		std::abort();
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		m_image = image;
+		readyChanged();
+		imageChanged();
+	}
+}
+
+RenderingPool::RenderingPool(const std::shared_ptr<Poppler::Document>& doc, QObject* parent)
+ : QObject(parent)
+ , m_doc(doc)
+{
+	m_pool = new QThreadPool(this);
+
+	for(int i = 0; i < m_doc->numPages(); ++i)
+	{
+		auto page = new RenderingPage(doc->page(i), m_pool, this);
+		connect(page, &RenderingPage::readyChanged, this, &RenderingPool::checkFinished);
+		append(page);
+	}
+}
+
+RenderingPool::~RenderingPool()
+{
+}
+
+void RenderingPool::triggerRender(const QSize& size)
+{
+	for(auto& obj : *this)
+	{
+		RenderingPage* page = reinterpret_cast<RenderingPage*>(obj);
+		page->triggerRender(size);
+	}
+}
+
+void RenderingPool::checkFinished()
+{
+	for(auto& obj : *this)
+	{
+		RenderingPage* page = reinterpret_cast<RenderingPage*>(obj);
+		if(!page->ready())
+			return;
+	}
+
+	renderingFinished();
+}
+
