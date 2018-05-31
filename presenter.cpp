@@ -69,10 +69,15 @@ int main(int argc, char** argv)
 
 	qmlRegisterType<ImageView>("presenter", 1, 0, "ImageView");
 
-	QQuickView view;
-	view.showFullScreen();
-	view.engine()->rootContext()->setContextProperty("controller", &controller);
-	view.setSource(QUrl("../ConsoleScreen.qml"));
+	QQuickView presenterView;
+	presenterView.showFullScreen();
+	presenterView.engine()->rootContext()->setContextProperty("controller", &controller);
+	presenterView.setSource(QUrl("../PresenterScreen.qml"));
+
+	QQuickView consoleView;
+	consoleView.showFullScreen();
+	consoleView.engine()->rootContext()->setContextProperty("controller", &controller);
+	consoleView.setSource(QUrl("../ConsoleScreen.qml"));
 
 	return app.exec();
 }
