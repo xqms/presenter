@@ -57,23 +57,36 @@ Rectangle {
 			property real margin : 4
 
 			delegate: Item {
+				id: delegate
 				width: slideSelector.cellWidth
 				height: slideSelector.cellHeight
 
-				PageView {
+				Item {
 					x: slideSelector.margin
 					y: slideSelector.margin
 					width: parent.width - 2*slideSelector.margin
 					height: parent.height - 2*slideSelector.margin
-					page: modelData
-					preview: true
 
-					MouseArea {
+					PageView {
 						anchors.fill: parent
-						onClicked: {
-							controller.currentSlideNumber = index;
-							controller.slideSelectorActive = false;
+						page: modelData
+						preview: true
+
+						MouseArea {
+							anchors.fill: parent
+							onClicked: {
+								controller.currentSlideNumber = index;
+								controller.slideSelectorActive = false;
+							}
 						}
+					}
+
+					/* Darken if not current item */
+					Rectangle {
+						anchors.fill: parent
+						visible: !delegate.GridView.isCurrentItem
+						color: "black"
+						opacity: 0.5
 					}
 				}
 			}
