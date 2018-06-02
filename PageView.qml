@@ -25,16 +25,24 @@ Rectangle {
 		image: page ? page.image : nullImage
 	}
 
-	Repeater {
-		model: (!preview && page) ? page.videoObjects : 0
-		Video {
-			source: modelData.url
-			autoPlay: modelData.autostart
-			loops: modelData.loop ? MediaPlayer.Infinite : 1
-			x: modelData.area.left * parent.width
-			y: modelData.area.top * parent.height
-			width: modelData.area.width * parent.width
-			height: modelData.area.height * parent.height
+	Item {
+		x: imageView.imageRect.x
+		y: imageView.imageRect.y
+		width: imageView.imageRect.width
+		height: imageView.imageRect.height
+		clip: true
+
+		Repeater {
+			model: (!preview && page) ? page.videoObjects : 0
+			Video {
+				source: modelData.url
+				autoPlay: modelData.autostart
+				loops: modelData.loop ? MediaPlayer.Infinite : 1
+				x: modelData.area.left * parent.width
+				y: modelData.area.top * parent.height
+				width: modelData.area.width * parent.width
+				height: modelData.area.height * parent.height
+			}
 		}
 	}
 }
