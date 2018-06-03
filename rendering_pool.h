@@ -21,6 +21,8 @@ Q_OBJECT
 Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
 Q_PROPERTY(QImage image READ image NOTIFY imageChanged)
 Q_PROPERTY(QList<QObject*> videoObjects READ videoObjects CONSTANT)
+Q_PROPERTY(int symbolicPageNumber READ symbolicPageNumber CONSTANT)
+Q_PROPERTY(QString label READ label CONSTANT)
 public:
 	explicit RenderingPage(const QUrl& file, Poppler::Page* page, QThreadPool* pool, QObject* parent = 0);
 	virtual ~RenderingPage();
@@ -37,6 +39,15 @@ public:
 
 	Poppler::Page* page() const
 	{ return m_page; }
+
+	int symbolicPageNumber() const
+	{ return m_symbolicPageNumber; }
+
+	void setSymbolicPageNumber(int num)
+	{ m_symbolicPageNumber = num; }
+
+	QString label() const
+	{ return m_page->label(); }
 Q_SIGNALS:
 	void readyChanged();
 	void imageChanged();
@@ -50,6 +61,8 @@ private:
 
 	QThreadPool* m_pool;
 	QFuture<void> m_future;
+
+	int m_symbolicPageNumber = 1;
 };
 
 class RenderingPool : public QObject, public QList<QObject*>

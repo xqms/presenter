@@ -1,5 +1,5 @@
 
-import QtQuick 2.0
+import QtQuick 2.5
 import presenter 1.0
 
 Rectangle {
@@ -45,16 +45,21 @@ Rectangle {
 		anchors.fill: parent
 		visible: controller.slideSelectorActive
 
+		FontMetrics {
+			id: labelMetrics
+			font.family: "Arial"
+		}
+
 		GridView {
 			id: slideSelector
 			anchors.fill: parent
 			model: controller.allPages
+			property real margin : 4
+			property real labelHeight: labelMetrics.height
 			cellWidth: container.width / 4
-			cellHeight: 9.0 / 16.0 * cellWidth /* FIXME */
+			cellHeight: 9.0 / 16.0 * (cellWidth - 2*margin) + 2*margin + labelHeight /* FIXME: fixed ratio */
 			focus: controller.slideSelectorActive
 			onFocusChanged: currentIndex = controller.currentSlideNumber
-
-			property real margin : 4
 
 			delegate: Item {
 				id: delegate
@@ -68,7 +73,9 @@ Rectangle {
 					height: parent.height - 2*slideSelector.margin
 
 					PageView {
-						anchors.fill: parent
+						id: pageView
+						width: parent.width
+						height: parent.height - slideSelector.labelHeight
 						page: modelData
 						preview: true
 
@@ -79,6 +86,16 @@ Rectangle {
 								controller.slideSelectorActive = false;
 							}
 						}
+					}
+
+					Text {
+						id: labelText
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.bottom: parent.bottom
+						width: parent.width
+						horizontalAlignment: Text.AlignHCenter
+						color: "white"
+						text: modelData.label
 					}
 
 					/* Darken if not current item */

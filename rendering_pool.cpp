@@ -6,6 +6,8 @@
 
 #include <QtConcurrent/QtConcurrent>
 
+#include <boost/lexical_cast.hpp>
+
 #include <iostream>
 
 RenderingPage::RenderingPage(const QUrl& file, Poppler::Page* page, QThreadPool* pool, QObject* parent)
@@ -94,6 +96,15 @@ RenderingPool::RenderingPool(const QUrl& file, const std::shared_ptr<Poppler::Do
 		auto page = new RenderingPage(file, doc->page(i), m_pool, this);
 		connect(page, &RenderingPage::readyChanged, this, &RenderingPool::checkFinished);
 		append(page);
+
+		page->setSymbolicPageNumber(i+1);
+	}
+
+	try
+	{
+	}
+	catch(boost::bad_lexical_cast)
+	{
 	}
 }
 
