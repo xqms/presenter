@@ -91,20 +91,72 @@ RenderingPool::RenderingPool(const QUrl& file, const std::shared_ptr<Poppler::Do
 {
 	m_pool = new QThreadPool(this);
 
+	bool slideLabelsAreNumbers = true;
+	std::vector<int> slideNumbers;
+	std::vector<int> slideAnimationIndices;
+	std::vector<int> slideAnimationCounts;
+
+	auto collectSlideNumber = [&](RenderingPage* page){
+		bool ok = true;
+		int num = page->label().toInt(&ok);
+		if(!ok)
+			return false;
+
+		if(num < 1)
+			return false;
+
+		// Check numbers are consecutive
+		if(slideNumbers.empty())
+		{
+			if(num != 1)
+				return false;
+		}
+		else
+		{
+			int last = slideNumbers.back();
+			if(last != num && last + 1 != num)
+				return false;
+		}
+
+		if(static_cast<std::size_t>(num-1) >= slideAnimationCounts.size())
+		{
+			slideAnimationIndices.push_back(0);
+			slideAnimationCounts.push_back(1);
+		}
+		else
+		{
+			slideAnimationIndices.push_back(slideAnimationCounts[num-1]);
+			slideAnimationCounts[num-1]++;
+		}
+
+		slideNumbers.push_back(num);
+
+		return true;
+	};
+
 	for(int i = 0; i < m_doc->numPages(); ++i)
 	{
 		auto page = new RenderingPage(file, doc->page(i), m_pool, this);
 		connect(page, &RenderingPage::readyChanged, this, &RenderingPool::checkFinished);
 		append(page);
 
-		page->setSymbolicPageNumber(i+1);
+		page->setSlideNumberInformation(i+1, 0, 1);
+
+		if(slideLabelsAreNumbers)
+			slideLabelsAreNumbers = collectSlideNumber(page);
 	}
 
-	try
+	if(slideLabelsAreNumbers)
 	{
-	}
-	catch(boost::bad_lexical_cast)
-	{
+		for(int i = 0; i < count(); ++i)
+		{
+			auto* page = reinterpret_cast<RenderingPage*>((*this)[i]);
+
+			page->setSlideNumberInformation(slideNumbers[i],
+				slideAnimationIndices[i],
+				slideAnimationCounts[slideNumbers[i]-1]
+			);
+		}
 	}
 }
 

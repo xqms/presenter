@@ -37,7 +37,7 @@ Rectangle {
 		font.pointSize: 60
 		anchors.bottom: parent.bottom
 		anchors.right: parent.right
-		text: "%1/%2".arg(controller.currentSlideNumber + 1).arg(controller.slideCount)
+		text: "%1/%2 %3/%4".arg(controller.currentPage.slideAnimationIndex+1).arg(controller.currentPage.slideAnimationCount).arg(controller.currentSlideNumber + 1).arg(controller.slideCount)
 	}
 
 	Rectangle {
