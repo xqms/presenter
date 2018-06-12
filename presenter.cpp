@@ -18,6 +18,14 @@
 #include <iostream>
 #include <memory>
 
+static const std::map<QString, int> EXTERNAL_SCREEN_SCORE{
+	{"eDP", -100}, // Most notebook displays
+	{"HDMI", 50},
+	{"VGA", 100},
+	{"DVI", 0},
+	{"DP", -50},
+};
+
 int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
@@ -44,18 +52,40 @@ int main(int argc, char** argv)
 	document->setRenderHint(Poppler::Document::Antialiasing, true);
 	document->setRenderHint(Poppler::Document::TextAntialiasing, true);
 
-	QScreen* presentationScreen = 0;
+	using ScoredScreen = std::pair<QScreen*, int>;
+	std::vector<ScoredScreen> scoredScreens;
+
 	for(auto& screen : app.screens())
 	{
-		qDebug() << "Connected screen: " << screen->size() << screen->name();
-		presentationScreen = screen;
+		int score = 0;
+		for(auto& rule : EXTERNAL_SCREEN_SCORE)
+		{
+			if(screen->name().contains(rule.first))
+			{
+				score += rule.second;
+			}
+		}
+
+		scoredScreens.emplace_back(screen, score);
 	}
 
-	if(!presentationScreen)
+	if(scoredScreens.empty())
 	{
 		std::cerr << "Could not find presentation screen\n";
 		return 1;
 	}
+
+	std::sort(scoredScreens.begin(), scoredScreens.end(), [](const ScoredScreen& a, const ScoredScreen& b){
+		return a.second < b.second;
+	});
+
+	for(auto& sc : scoredScreens)
+	{
+		qDebug() << "Screen" << sc.first->name() << "has score" << sc.second;
+	}
+
+	QScreen* presentationScreen = scoredScreens.back().first;
+	QScreen* consoleScreen = scoredScreens.front().first;
 
 	RenderingPool pool(QUrl::fromLocalFile(file), document);
 
@@ -70,11 +100,15 @@ int main(int argc, char** argv)
 	qmlRegisterType<ImageView>("presenter", 1, 0, "ImageView");
 
 	QQuickView presenterView;
+	presenterView.setScreen(presentationScreen);
+	presenterView.setGeometry(presentationScreen->geometry());
 	presenterView.showFullScreen();
 	presenterView.engine()->rootContext()->setContextProperty("controller", &controller);
 	presenterView.setSource(QUrl("../PresenterScreen.qml"));
 
 	QQuickView consoleView;
+	consoleView.setScreen(consoleScreen);
+	consoleView.setGeometry(consoleScreen->geometry());
 	consoleView.showFullScreen();
 	consoleView.engine()->rootContext()->setContextProperty("controller", &controller);
 	consoleView.setSource(QUrl("../ConsoleScreen.qml"));
