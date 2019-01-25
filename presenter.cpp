@@ -28,6 +28,10 @@ static const std::map<QString, int> EXTERNAL_SCREEN_SCORE{
 
 int main(int argc, char** argv)
 {
+	// Smooth video playback
+	if(!getenv("QSG_RENDER_LOOP"))
+		setenv("QSG_RENDER_LOOP", "threaded", 1);
+
 	QApplication app(argc, argv);
 
 	if(app.arguments().count() < 2)
