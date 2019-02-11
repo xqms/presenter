@@ -29,9 +29,5 @@ Item {
 			controller.previousSlide();
 			event.accepted = true;
 		}
-		else
-		{
-			console.log("key:", event.key);
-			}
 	}
 }
