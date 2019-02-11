@@ -19,5 +19,19 @@ Item {
 			controller.resetTime();
 			event.accepted = true;
 		}
+		else if(event.key == Qt.Key_MediaNext || event.key == Qt.Key_PageDown)
+		{
+			controller.nextSlide();
+			event.accepted = true;
+		}
+		else if(event.key == Qt.Key_MediaPrevious || event.key == Qt.Key_PageUp)
+		{
+			controller.previousSlide();
+			event.accepted = true;
+		}
+		else
+		{
+			console.log("key:", event.key);
+			}
 	}
 }
