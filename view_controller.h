@@ -48,12 +48,28 @@ public Q_SLOTS:
 	void resetTime();
 	void setSlideSelectorActive(bool on)
 	{ m_slideSelectorActive = on; slideSelectorActiveChanged(); }
+
+	void triggerVideoPause() { videoPause(); }
+
+	void triggerVideoFaster() { videoFaster(); }
+	void triggerVideoSlower() { videoSlower(); }
+
+	void triggerVideoSeekBack() { videoSeekBack(); }
+	void triggerVideoSeekFwd() { videoSeekFwd(); }
 Q_SIGNALS:
 	void currentSlideNumberChanged(int number);
 
 	void elapsedTimeChanged();
 
 	void slideSelectorActiveChanged();
+
+	void videoPause();
+
+	void videoFaster();
+	void videoSlower();
+
+	void videoSeekBack();
+	void videoSeekFwd();
 
 private Q_SLOTS:
 	void timerTick();

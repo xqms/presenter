@@ -7,6 +7,7 @@ import presenter 1.0
 Rectangle {
 	property var page
 	property bool preview: false
+	property bool isConsole: false
 
 	height: width / imageView.aspectRatio
 	color: "black"
@@ -33,6 +34,7 @@ Rectangle {
 		clip: true
 
 		Repeater {
+			id: videoRepeater
 			model: (!preview && page) ? page.videoObjects : 0
 			Video {
 				source: modelData.url
@@ -42,6 +44,55 @@ Rectangle {
 				y: modelData.area.top * parent.height
 				width: modelData.area.width * parent.width
 				height: modelData.area.height * parent.height
+
+				Connections {
+					target: controller
+					onVideoPause: function() {
+						if(playbackState == MediaPlayer.PlayingState)
+							pause();
+						else
+							play();
+					}
+					onVideoFaster: function() {
+						console.log("playbackRate before:", playbackRate);
+						playbackRate = 2 * playbackRate;
+						console.log("playbackRate after:", playbackRate);
+					}
+					onVideoSlower: function() {
+						playbackRate = playbackRate / 2;
+					}
+					onVideoSeekBack: function() {
+						seek(position - 5000);
+					}
+					onVideoSeekFwd: function() {
+						seek(position + 5000);
+					}
+				}
+
+				Rectangle {
+					visible: isConsole
+					anchors.left: parent.left
+					anchors.bottom: parent.bottom
+
+					color: "red"
+
+					width: parent.width * parent.position / parent.duration
+					height: 25
+
+					Text {
+						x: 0
+						y: 0
+
+						Binding on text {
+							when: !!parent.playbackRate
+							value: parent.playbackRate
+						}
+						color: "white"
+						font.pointSize: 24
+
+						onTextChanged: function() { console.log("new text:", text, parent.playbackRate); }
+					}
+				}
 			}
 		}
 	}

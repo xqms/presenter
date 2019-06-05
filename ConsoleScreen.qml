@@ -14,6 +14,7 @@ Rectangle {
 		anchors.left: parent.left
 		page: controller.currentPage
 		width: (1.0 / 1.618034) * parent.width
+		isConsole: true
 	}
 
 	PageView {
