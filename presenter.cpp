@@ -8,6 +8,7 @@
 #include <poppler-qt5.h>
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QDebug>
 #include <QImage>
 #include <QScreen>
@@ -33,14 +34,20 @@ int main(int argc, char** argv)
 		setenv("QSG_RENDER_LOOP", "threaded", 1);
 
 	QApplication app(argc, argv);
+	app.setApplicationName("presenter");
+	app.setApplicationVersion("0.9.0");
 
-	if(app.arguments().count() < 2)
-	{
-		std::cerr << "Usage: presenter <PDF>\n";
-		return 1;
-	}
+	QCommandLineParser parser;
+	parser.addHelpOption();
+	parser.addVersionOption();
+	parser.addPositionalArgument("file", QCoreApplication::translate("presenter", "PDF file to open"));
 
-	QString file = app.arguments().at(1);
+	QCommandLineOption optSwap({"s", "swap"}, QCoreApplication::translate("presenter", "Swap screens"));
+	parser.addOption(optSwap);
+
+	parser.process(app);
+
+	QString file = parser.positionalArguments().at(0);
 	qDebug() << "Opening" << file;
 
 	std::shared_ptr<Poppler::Document> document(
@@ -88,8 +95,11 @@ int main(int argc, char** argv)
 		qDebug() << "Screen" << sc.first->name() << "has score" << sc.second;
 	}
 
-	QScreen* presentationScreen = scoredScreens.back().first;
-	QScreen* consoleScreen = scoredScreens.front().first;
+	QScreen* presentationScreen = scoredScreens.front().first;
+	QScreen* consoleScreen = scoredScreens.back().first;
+
+	if(parser.isSet(optSwap))
+		std::swap(presentationScreen, consoleScreen);
 
 	RenderingPool pool(QUrl::fromLocalFile(file), document);
 
