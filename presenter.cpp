@@ -5,7 +5,7 @@
 #include "image_view.h"
 #include "view_controller.h"
 
-#include <poppler-qt5.h>
+#include <poppler-qt6.h>
 
 #include <QApplication>
 #include <QCommandLineParser>

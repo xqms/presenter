@@ -16,7 +16,7 @@ ViewController::ViewController(RenderingPool* renderingPool, QObject* parent)
 
 void ViewController::setCurrentSlideNumber(int number)
 {
-	m_slideNumber = std::max(0, std::min(m_renderingPool->count()-1, number));
+	m_slideNumber = std::max(0, std::min<int>(m_renderingPool->count()-1, number));
 	currentSlideNumberChanged(m_slideNumber);
 }
 

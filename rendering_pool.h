@@ -11,7 +11,7 @@
 #include <QFuture>
 #include <QMutex>
 
-#include <poppler-qt5.h>
+#include <poppler-qt6.h>
 
 #include <memory>
 
@@ -26,7 +26,7 @@ Q_PROPERTY(int slideNumber READ slideNumber CONSTANT)
 Q_PROPERTY(int slideAnimationIndex READ slideAnimationIndex CONSTANT)
 Q_PROPERTY(int slideAnimationCount READ slideAnimationCount CONSTANT)
 public:
-	explicit RenderingPage(const QUrl& file, Poppler::Page* page, QThreadPool* pool, QObject* parent = 0);
+	explicit RenderingPage(const QUrl& file, std::unique_ptr<Poppler::Page>&& page, QThreadPool* pool, QObject* parent = 0);
 	virtual ~RenderingPage();
 
 	bool ready() const;
@@ -40,7 +40,7 @@ public:
 	{ return m_videoObjects; }
 
 	Poppler::Page* page() const
-	{ return m_page; }
+	{ return m_page.get(); }
 
 	QString label() const
 	{ return m_page->label(); }
@@ -65,7 +65,7 @@ Q_SIGNALS:
 	void imageChanged();
 private:
 	mutable QMutex m_mutex;
-	Poppler::Page* m_page;
+	std::unique_ptr<Poppler::Page> m_page;
 	QSize m_size;
 	QImage m_image;
 

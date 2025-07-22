@@ -10,16 +10,16 @@
 
 #include <iostream>
 
-RenderingPage::RenderingPage(const QUrl& file, Poppler::Page* page, QThreadPool* pool, QObject* parent)
+RenderingPage::RenderingPage(const QUrl& file, std::unique_ptr<Poppler::Page>&& page, QThreadPool* pool, QObject* parent)
  : QObject(parent)
- , m_page(page)
+ , m_page{std::move(page)}
  , m_pool(pool)
 {
 	for(auto& link : m_page->links())
 	{
 		if(link->linkType() == Poppler::Link::Execute)
 		{
-			auto execLink = reinterpret_cast<Poppler::LinkExecute*>(link);
+			auto execLink = reinterpret_cast<Poppler::LinkExecute*>(link.get());
 
 			VideoObject* obj = new VideoObject(this);
 			obj->setArea(execLink->linkArea());
@@ -59,7 +59,7 @@ void RenderingPage::triggerRender(const QSize& size)
 		m_size = size;
 	}
 
-	m_future = QtConcurrent::run(m_pool, this, &RenderingPage::render);
+	m_future = QtConcurrent::run(m_pool, &RenderingPage::render, this);
 }
 
 void RenderingPage::render()

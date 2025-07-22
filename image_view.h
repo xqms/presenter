@@ -36,7 +36,7 @@ Q_SIGNALS:
 	void imageChanged();
 	void imageRectChanged();
 protected:
-	void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+	void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
 	void recalculateImageRect(const QSizeF& outerSize);
 private:
 	QImage m_image;

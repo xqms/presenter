@@ -66,8 +66,9 @@ void ImageView::recalculateImageRect(const QSizeF& outerSize)
 }
 
 
-void ImageView::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+void ImageView::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
+	QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
 	recalculateImageRect(newGeometry.size());
 }
 

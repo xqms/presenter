@@ -1,7 +1,7 @@
 
 import QtQuick 2.0
-import QtQuick.Controls 1.2
-import QtMultimedia 5.8
+import QtQuick.Controls
+import QtMultimedia
 import presenter 1.0
 
 Rectangle {
