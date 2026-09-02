@@ -28,6 +28,11 @@ void ViewController::nextSlide()
 		m_timer->start(1000);
 }
 
+void ViewController::firstSlide()
+{
+	setCurrentSlideNumber(0);
+}
+
 void ViewController::previousSlide()
 {
 	setCurrentSlideNumber(currentSlideNumber() - 1);

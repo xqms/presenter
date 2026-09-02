@@ -43,6 +43,7 @@ public:
 public Q_SLOTS:
 	void nextSlide();
 	void previousSlide();
+	void firstSlide();
 	void setCurrentSlideNumber(int number);
 	void quit();
 	void resetTime();

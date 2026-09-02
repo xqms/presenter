@@ -30,6 +30,11 @@ Item {
 			controller.previousSlide();
 			event.accepted = true;
 		}
+		else if(event.key == Qt.Key_Home)
+		{
+			controller.firstSlide();
+			event.accepted = true;
+		}
 		else if(event.key == Qt.Key_P)
 		{
 			controller.triggerVideoPause();
