@@ -5,6 +5,7 @@
 #define VIEW_CONTROLLER_H
 
 #include <QObject>
+#include <QPointF>
 
 #include "rendering_pool.h"
 
@@ -18,6 +19,8 @@ Q_PROPERTY(QObject* nextPage READ nextPage NOTIFY currentSlideNumberChanged)
 Q_PROPERTY(QString elapsedTimeString READ elapsedTimeString NOTIFY elapsedTimeChanged)
 Q_PROPERTY(bool slideSelectorActive READ slideSelectorActive WRITE setSlideSelectorActive NOTIFY slideSelectorActiveChanged)
 Q_PROPERTY(QList<QObject*> allPages READ allPages CONSTANT)
+Q_PROPERTY(bool pointerVisible READ pointerVisible WRITE setPointerVisible NOTIFY pointerVisibleChanged)
+Q_PROPERTY(QPointF pointerPos READ pointerPos WRITE setPointerPos NOTIFY pointerPosChanged)
 public:
 	explicit ViewController(RenderingPool* renderingPool, QObject* parent = 0);
 
@@ -40,6 +43,13 @@ public:
 	const QList<QObject*>& allPages() const
 	{ return *m_renderingPool; }
 
+	bool pointerVisible() const
+	{ return m_pointerVisible; }
+
+	//! Pointer position, relative to the slide (both coordinates in [0,1])
+	QPointF pointerPos() const
+	{ return m_pointerPos; }
+
 public Q_SLOTS:
 	void nextSlide();
 	void previousSlide();
@@ -49,6 +59,24 @@ public Q_SLOTS:
 	void resetTime();
 	void setSlideSelectorActive(bool on)
 	{ m_slideSelectorActive = on; slideSelectorActiveChanged(); }
+
+	void setPointerVisible(bool on)
+	{
+		if(on == m_pointerVisible)
+			return;
+
+		m_pointerVisible = on;
+		pointerVisibleChanged();
+	}
+
+	void setPointerPos(const QPointF& pos)
+	{
+		if(pos == m_pointerPos)
+			return;
+
+		m_pointerPos = pos;
+		pointerPosChanged();
+	}
 
 	void triggerVideoPause() { videoPause(); }
 
@@ -63,6 +91,9 @@ Q_SIGNALS:
 	void elapsedTimeChanged();
 
 	void slideSelectorActiveChanged();
+
+	void pointerVisibleChanged();
+	void pointerPosChanged();
 
 	void videoPause();
 
@@ -85,6 +116,9 @@ private:
 	QTimer* m_timer;
 
 	bool m_slideSelectorActive = false;
+
+	bool m_pointerVisible = false;
+	QPointF m_pointerPos;
 };
 
 #endif

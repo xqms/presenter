@@ -11,6 +11,7 @@ Rectangle {
 
 		anchors.fill: parent
 		page: controller.currentPage
+		showPointer: true
 	}
 
 	KeyMap {}

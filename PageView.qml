@@ -9,6 +9,9 @@ Rectangle {
 	property bool preview: false
 	property bool isConsole: false
 
+	/* Show the red pointer dot mirroring the mouse cursor on the console */
+	property bool showPointer: false
+
 	height: width / imageView.aspectRatio
 	color: "black"
 
@@ -27,6 +30,8 @@ Rectangle {
 	}
 
 	Item {
+		id: slideArea
+
 		x: imageView.imageRect.x
 		y: imageView.imageRect.y
 		width: imageView.imageRect.width
@@ -94,6 +99,33 @@ Rectangle {
 					}
 				}
 			}
+		}
+
+		/* Track the mouse cursor on the console and mirror it on the presenter screen */
+		MouseArea {
+			anchors.fill: parent
+			enabled: isConsole && !controller.slideSelectorActive
+			hoverEnabled: true
+			acceptedButtons: Qt.NoButton
+
+			onContainsMouseChanged: controller.pointerVisible = containsMouse
+			onPositionChanged: function(mouse) {
+				controller.pointerPos = Qt.point(mouse.x / width, mouse.y / height);
+			}
+		}
+
+		Rectangle {
+			id: pointerDot
+
+			visible: showPointer && controller.pointerVisible
+
+			width: Math.max(8, 0.012 * slideArea.width)
+			height: width
+			radius: width / 2
+			color: "red"
+
+			x: controller.pointerPos.x * slideArea.width - width / 2
+			y: controller.pointerPos.y * slideArea.height - height / 2
 		}
 	}
 }
